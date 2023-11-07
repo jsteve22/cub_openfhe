@@ -58,3 +58,4 @@ endif()
 ### EXAMPLE:
 ### add_executable( test demo-simple-example.cpp )
 add_executable( example depth-bfvrns.cpp )
+add_executable( demoopenfhe openfhedemo.cpp )
