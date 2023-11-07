@@ -22,7 +22,7 @@ RUN sudo make install
 
 WORKDIR /test/openfhe_demo
 RUN cmake -S . -B .
-RUN make
+# RUN make
 ENV LD_LIBRARY_PATH /test/openfhe-development/build/lib
 
 WORKDIR /test/openfhe_demo
