@@ -11,7 +11,7 @@
 #include<math.h>
 
 using namespace std;
-using namespace seal;
+using namespace lbcrypto;
 
 typedef uint64_t u64;
 typedef int64_t  i64;
@@ -56,25 +56,39 @@ int main() {
 
   // u64 poly_degree = 1<<11;
   // u64 size = poly_degree;
-  EncryptionParameters parms(scheme_type::bfv);
-  size_t poly_modulus_degree = POLY_DEGREE;
-  u64 size = poly_modulus_degree;
-  parms.set_poly_modulus_degree(poly_modulus_degree);
 
-  parms.set_plain_modulus(PLAINTEXT_MOD);
+  CCParams<CryptoContextBFVRNS> parameters;
+  parameters.SetPlaintextModulus(536903681);
+  parameters.SetMultiplicativeDepth(3);
+  parameters.SetMaxRelinSkDeg(3);
+  
+  CryptoContext<DCRTPoly> cryptoContext = GenCryptoContext(parameters);
+  // enable features that you wish to use
+  cryptoContext->Enable(PKE);
+  cryptoContext->Enable(KEYSWITCH);
+  cryptoContext->Enable(LEVELEDSHE);
+  cryptoContext->Enable(ADVANCEDSHE);
 
-  parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
+  KeyPair<DCRTPoly> keyPair;
 
-  SEALContext context(parms);
+  keyPair = cryptoContext->KeyGen();
 
-  KeyGenerator keygen(context);
-  SecretKey secret_key = keygen.secret_key();
-  PublicKey public_key;
-  keygen.create_public_key(public_key);
+  if (!keyPair.good()) {
+    std::cout << "Key generation failed!" << std::endl;
+    exit(1);
+  }
 
-  Encryptor encryptor(context, public_key);
-  Evaluator evaluator(context);
-  Decryptor decryptor(context, secret_key);
+  // Generating Plaintexts
+  // Plaintext plaintext1               = cryptoContext->MakeCoefPackedPlaintext(vectorOfInts1);
+  //
+  // Encrypting plaintexts
+  // Ciphertext<DCRTPoly> ciphertext = cryptoContext->Encrypt(keyPair.publicKey, plaintext1);
+  //
+  // Decrypting ciphertexts
+  // cryptoContext->Decrypt(keyPair.secretKey, ciphertexts[0], &plaintextDecMult);
+  //
+  // Plaintext polynomial multiplication
+  // Ciphertext<DCRTPoly> result = cryptoContext->EvalMultMutable(ciphertexts[0], plaintext2);
 
   i64 i, j, k;
 
